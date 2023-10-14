@@ -1,0 +1,60 @@
+import json
+
+# Initialize an empty list to store transactions
+transactions = []
+
+def add_transaction():
+    category = input("Enter category (e.g., Food, Rent): ")
+    amount = float(input("Enter amount: "))
+    transaction_type = input("Is it an expense or income? (E/I): ").upper()
+    
+    if transaction_type == 'E':
+        amount *= -1  # Convert expense to a negative amount
+    
+    transaction = {
+        "category": category,
+        "amount": amount
+    }
+    
+    transactions.append(transaction)
+    print("Transaction added successfully!")
+
+def calculate_budget():
+    total_income = sum([t["amount"] for t in transactions if t["amount"] > 0])
+    total_expenses = sum([t["amount"] for t in transactions if t["amount"] < 0])
+    remaining_budget = total_income + total_expenses
+    return remaining_budget
+
+def save_transactions():
+    with open("budget_data.json", "w") as file:
+        json.dump(transactions, file)
+
+def load_transactions():
+    try:
+        with open("budget_data.json", "r") as file:
+            data = json.load(file)
+            transactions.extend(data)
+    except FileNotFoundError:
+        pass
+
+# Load existing transactions if available
+load_transactions()
+
+while True:
+    print("
+Budget Tracker Menu:")
+    print("1. Add Transaction")
+    print("2. Calculate Remaining Budget")
+    print("3. Exit")
+    
+    choice = input("Enter your choice: ")
+    
+    if choice == '1':
+        add_transaction()
+    elif choice == '2':
+        remaining_budget = calculate_budget()
+        print(f"Remaining Budget: ${remaining_budget:.2f}")
+    elif choice == '3':
+        save_transactions()
+        print("Exiting Budget Tracker. Your data has been saved.")
+        break
